@@ -16,9 +16,14 @@ const (
 */
 
 type LexerOnline struct {
-	automa lexerDfaBetter
+	Automa lexerDfaBetter
 }
 
-func (l LexerOnline) yyLex(data []byte, pos int) (Rune, int) {
-	return Rune{}, 0
+func (l *LexerOnline) nextChar(data byte, eof bool) (Rune, int) {
+	isValid := l.Automa.nextState(int(data))
+	if !isValid {
+		//if (l.Automa.)
+
+	}
+	return _, 0
 }
