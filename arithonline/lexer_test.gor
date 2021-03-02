@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func dummyArith(rule Rule, mem *memory) int {
+func dummyArith(rule Rule, yydata yyData, mem *memory) int {
 	switch rule.rule {
 	case 0:
 		{
@@ -39,7 +39,7 @@ func dummyArith(rule Rule, mem *memory) int {
 			if err != nil {
 				return LEX_ERROR
 			}
-			(*mem).save("Number: " + rule.yytext)
+			(*mem).save("Number: " + yydata.yytext)
 			//*genSym = symbol{NUMBER, 0, num, nil, nil}
 			return LEX_CORRECT
 		}
@@ -62,7 +62,7 @@ func dummyArith(rule Rule, mem *memory) int {
 func TestDummyF(t *testing.T) {
 	low := ListOfWords{}
 	var mem memory = &low
-	dummyArith(Rule{3, "+", 0, 0}, &mem)
+	dummyArith(Rule{3, "+"}, yyData{}, &mem)
 	if low.toString() != "PLUS" {
 		t.Error("Expected PLUS, returned ", low.toString())
 
@@ -74,7 +74,7 @@ func TestLexer(t *testing.T) {
 	low := ListOfWords{}
 	var mem memory = &low
 	testString := "(3 + 2) * 5"
-	lexer := Lexer{
+	lexer := LexerReader{
 		dfaLanguage,
 		[]byte(testString),
 		0,

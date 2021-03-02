@@ -2,7 +2,6 @@ package arithonline
 
 import (
 	"errors"
-	"fmt"
 )
 
 //Rule represents the number and the
@@ -17,55 +16,67 @@ type yyData struct {
 	end    int
 }
 
-// Lexer is an abstraction to get
-type Lexer struct {
+// LexerReader is an abstraction to get
+type LexerReader struct {
 	Automa lexerDfa
 	data   []byte
-	pos    int
-	mem    memory
-	action func(Rule, yyData, *memory) int
+	Pos    int
+	//mem    memory
+	//action func(Rule, yyData, *memory) int
 }
 
-func (l Lexer) currentByte() byte {
-	return l.data[l.pos]
+func (l LexerReader) currentByte() byte {
+	return l.data[l.Pos]
 }
 
-func (l Lexer) eof() bool {
-	return l.pos == len(l.data)-1
+func (l LexerReader) eof() bool {
+	return l.Pos == len(l.data)
 }
 
-func (l *Lexer) yyLex() (Rule, yyData, error) {
+func (l *LexerReader) yyLex() (Rule, yyData, error) {
 	controlState := TOKEN_INCOMPLETE
-	start := l.pos
+	start := l.Pos
 	end := start
 	for controlState == TOKEN_INCOMPLETE {
-		isValidTransaction := l.Automa.nextState(int(l.currentByte()))
-		if isValidTransaction && !l.eof() {
-			controlState = TOKEN_INCOMPLETE
-		} else if isValidTransaction && l.eof() && l.Automa.isFinal() {
+		if !l.eof() {
+			isValidTransition := l.Automa.nextState(int(l.currentByte()))
+			{
+				//fmt.Printf("Pos: %d, Start: %d\n", l.Pos, start)
+				if isValidTransition {
+					//Case 0: EOF not reached, char generates a valid transition
+					controlState = TOKEN_INCOMPLETE
+					l.Pos++
+				} else if l.Pos != start && l.Automa.isFinal() {
+					//Case 1: EOF not reached, char doesn't generate valid transition
+					//but we just finished to lex a valid token
+					controlState = TOKEN_COMPLETE
+					end = l.Pos
+				} else {
+					//Case 3: EOF not reached, every other case invalid
+					controlState = TOKEN_ERROR
+				}
+			}
+		} else if l.Automa.isFinal() {
+			//Case 4: reached EOF, last char generates a valid transition to a final state
 			controlState = TOKEN_COMPLETE
 			end = len(l.data)
-		} else if isValidTransaction && l.eof() && !l.Automa.isFinal() {
-			controlState = TOKEN_ERROR
-		} else if !isValidTransaction && !l.eof() {
-			controlState = TOKEN_COMPLETE
-			end = l.pos - 1
-			l.pos--
-		} else if !isValidTransaction && l.eof() {
+		} else {
+			//Case 5: reached EOF, every other case invalid
 			controlState = TOKEN_ERROR
 		}
-		l.pos++
 	}
 	if controlState == TOKEN_ERROR {
 		return Rule{}, yyData{}, errors.New("Error found during lexing")
 	}
-	rule := Rule{l.Automa.getRuleNumber(), "p"}
+	rule := Rule{l.Automa.getRuleNumber(), l.Automa.getCurrentState().TokenString}
 	yydata := yyData{string(l.data[start:end]), start, end}
 	l.Automa.CurState = 0
 	return rule, yydata, nil
 }
 
-func (l *Lexer) lex() error {
+/*
+
+func (l *LexerReader) lex() error {
 	var err error
 	rule := Rule{}
 	yydata := yyData{}
@@ -86,3 +97,4 @@ func (l *Lexer) lex() error {
 	}
 	return err
 }
+*/
