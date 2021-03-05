@@ -4,8 +4,8 @@ import (
 	"errors"
 )
 
-//Rule represents the number and the
-type Rule struct {
+//LexerRule represents the number and the
+type LexerRule struct {
 	rule  int
 	token string
 }
@@ -33,7 +33,7 @@ func (l LexerReader) eof() bool {
 	return l.Pos == len(l.data)
 }
 
-func (l *LexerReader) yyLex() (Rule, yyData, error) {
+func (l *LexerReader) yyLex() (LexerRule, yyData, error) {
 	controlState := TOKEN_INCOMPLETE
 	start := l.Pos
 	end := start
@@ -66,9 +66,9 @@ func (l *LexerReader) yyLex() (Rule, yyData, error) {
 		}
 	}
 	if controlState == TOKEN_ERROR {
-		return Rule{}, yyData{}, errors.New("Error found during lexing")
+		return LexerRule{}, yyData{}, errors.New("Error found during lexing")
 	}
-	rule := Rule{l.Automa.getRuleNumber(), l.Automa.getCurrentState().TokenString}
+	rule := LexerRule{l.Automa.getRuleNumber(), l.Automa.getCurrentState().TokenString}
 	yydata := yyData{string(l.data[start:end]), start, end}
 	l.Automa.CurState = 0
 	return rule, yydata, nil

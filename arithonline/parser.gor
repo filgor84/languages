@@ -1,0 +1,25 @@
+package arithonline
+
+const (
+	PARSE_FINISHED = 0
+)
+
+func ParseString(data []byte) ( /*dichiarabile*/ int64, error) {
+	dataMemory := StackInt64{}
+	symbolMemory := StackSymbol{}
+	lexerReader := LexerReader{
+		dfaLanguage,
+		[]byte(data),
+		0}
+	for !lexerReader.eof() {
+		rule, yydata, err := lexerReader.yyLex()
+		if err != nil {
+			return -1, err
+		}
+		controlState, symbol, err := lexerExecutor(rule, yydata, &dataMemory)
+		if controlState == LEX_CORRECT {
+			//parseSymbol(symbol, &symbolMemory)
+		}
+
+	}
+}
