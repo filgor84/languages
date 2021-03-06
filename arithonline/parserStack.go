@@ -58,8 +58,8 @@ func (p *parserStack) getLastTerminalSymbol() (Symbol, error) {
 	return p.stackSymbol.read(pos)
 }
 
-func (p *parserStack) popCandidateRule() ([]Symbol, error) {
-
+func (p *parserStack) popCandidateRule() ([]uint16, error) {
+	var res []Symbol
 	tPos, err := p.stackYieldPPos.pop()
 	if err != nil {
 		return nil, err
@@ -71,11 +71,15 @@ func (p *parserStack) popCandidateRule() ([]Symbol, error) {
 	p.stackTerminalPos.Top = tPos
 
 	if isTerminal(p.stackSymbol.data[sPos-1].symbolId) {
-		res := p.stackSymbol.data[sPos:p.stackSymbol.Top]
+		res = p.stackSymbol.data[sPos:p.stackSymbol.Top]
 		p.stackSymbol.Top = sPos
-		return res, nil
+	} else {
+		res = p.stackSymbol.data[sPos-1 : p.stackSymbol.Top]
+		p.stackSymbol.Top = sPos - 1
 	}
-	res := p.stackSymbol.data[sPos-1 : p.stackSymbol.Top]
-	p.stackSymbol.Top = sPos - 1
-	return res, nil
+	var candRule []uint16
+	for _, v := range res {
+		candRule = append(candRule, v.symbolId)
+	}
+	return candRule, nil
 }
