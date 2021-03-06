@@ -69,8 +69,7 @@ func (p *parserStack) popCandidateRule() ([]uint16, error) {
 		return nil, err
 	}
 	p.stackTerminalPos.Top = tPos
-
-	if isTerminal(p.stackSymbol.data[sPos-1].symbolId) {
+	if sPos == 0 || isTerminal(p.stackSymbol.data[sPos-1].symbolId) {
 		res = p.stackSymbol.data[sPos:p.stackSymbol.Top]
 		p.stackSymbol.Top = sPos
 	} else {

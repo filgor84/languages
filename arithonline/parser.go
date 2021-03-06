@@ -25,7 +25,7 @@ func ParseString(data []byte) (int64, error) {
 		}
 		controlState, symbolID, err = lexerExecutor(lexerRule, yydata, &dataMemory)
 
-		if controlState == LEX_CORRECT {
+		if controlState == _LEX_CORRECT {
 			if isTerminal(symbolID) {
 				if pStack.hasTerminal() {
 					lastTerminal, err = pStack.getLastTerminalSymbol()
