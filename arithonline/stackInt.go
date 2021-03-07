@@ -19,13 +19,6 @@ func (s StackInt) stackFull() bool {
 	return s.Top == STACKSIZE
 }
 
-func (s StackInt) readTop() (int, error) {
-	if !s.stackEmpty() {
-		return s.data[s.Top-1], nil
-	}
-	return -1, errors.New("StackInt.readTop(): the stack is empty")
-}
-
 func (s *StackInt) push(i int) error {
 	if !s.stackFull() {
 		s.data[s.Top] = i

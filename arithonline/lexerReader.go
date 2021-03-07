@@ -39,7 +39,7 @@ func (l *LexerReader) yyLex() (LexerRule, yyData, error) {
 	end := start
 	for controlState == TOKEN_INCOMPLETE {
 		if !l.eof() {
-			isValidTransition := l.Automa.nextState(int(l.currentByte()))
+			isValidTransition := l.Automa.nextState(int(l.data[l.Pos]))
 			{
 				//fmt.Printf("Pos: %d, Start: %d\n", l.Pos, start)
 				if isValidTransition {

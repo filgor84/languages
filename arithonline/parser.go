@@ -6,25 +6,35 @@ func ParseString(data []byte) (int64, error) {
 	pStack := parserStack{}
 	lexerReader := LexerReader{
 		dfaLanguage,
-		[]byte(data),
+		data,
 		0}
+	var inputNumber int
+	var x int64
+	var y int64
+	var output int64
+	var hasOutput bool
 	var lastTerminal Symbol
 	var precedence uint16
 	var candRule []uint16
 	var res int64
+	var hasValue bool
 	var lexerRule LexerRule
 	var yydata yyData
 	var err error
 	var symbolID uint16
 	var controlState int
+	//user declared type
+	var yyValue int64
 
 	for !lexerReader.eof() {
 		lexerRule, yydata, err = lexerReader.yyLex()
 		if err != nil {
 			return -1, err
 		}
-		controlState, symbolID, err = lexerExecutor(lexerRule, yydata, &dataMemory)
-
+		controlState, hasValue, yyValue, symbolID, err = lexerExecutorNew(lexerRule, yydata)
+		if hasValue {
+			dataMemory.push(yyValue)
+		}
 		if controlState == _LEX_CORRECT {
 			if isTerminal(symbolID) {
 				if pStack.hasTerminal() {
@@ -35,7 +45,17 @@ func ParseString(data []byte) (int64, error) {
 					for precedence == _TAKES_PREC {
 						candRule, err = pStack.popCandidateRule()
 						lhs, pRule := findMatch(candRule)
-						err = parseExecutor(pRule, &dataMemory)
+						inputNumber = rule2InputNumber[int(pRule)]
+						if inputNumber == 2 {
+							y, err = dataMemory.pop()
+							x, err = dataMemory.pop()
+						}
+						hasOutput, output = parseExecutorNew(pRule, x, y)
+						if hasOutput {
+							err = dataMemory.push(output)
+						}
+
+						//err = parseExecutor(pRule, &dataMemory)
 						pStack.pushSymbol(Symbol{lhs, _NO_PREC})
 
 						//executefunction associated to candRule and push nonterminal
@@ -61,7 +81,16 @@ func ParseString(data []byte) (int64, error) {
 			for pStack.hasTerminal() {
 				candRule, err = pStack.popCandidateRule()
 				lhs, pRule := findMatch(candRule)
-				err = parseExecutor(pRule, &dataMemory)
+				inputNumber = rule2InputNumber[int(pRule)]
+				if inputNumber == 2 {
+					y, err = dataMemory.pop()
+					x, err = dataMemory.pop()
+				}
+				hasOutput, output = parseExecutorNew(pRule, x, y)
+				if hasOutput {
+					err = dataMemory.push(output)
+				}
+
 				pStack.pushSymbol(Symbol{lhs, _NO_PREC})
 				//executefunction associated to candRule and push nonterminal
 			}

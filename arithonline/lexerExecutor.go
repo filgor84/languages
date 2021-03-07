@@ -4,12 +4,6 @@ import (
 	"strconv"
 )
 
-const (
-	_LEX_CORRECT = 0
-	_LEX_ERROR   = 1
-	_SKIP        = 2
-)
-
 /*
 lexerFunction is the semantic function of the lexer.
 */
