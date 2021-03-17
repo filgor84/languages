@@ -5,10 +5,10 @@ func ParseStringNew(data []byte) (int64, error) {
 	dataMemory := StackInt64{}
 	var stackSymbol StackUInt16
 	//var stackPrecedence StackUInt16
-	var stackTerminalPos StackInt
+	//var stackTerminalPos StackInt
 	var stackYieldPPos StackInt
 	var lastTerminalSymbol uint16
-	var tPos int
+	//var tPos int
 	var sPos int
 	lexerReader := LexerReader{
 		dfaLanguage,
@@ -41,15 +41,108 @@ func ParseStringNew(data []byte) (int64, error) {
 			dataMemory.push(yyValue)
 		}
 		if controlState == _LEX_CORRECT {
-			if isTerminal(symbolID) {
-				if !stackTerminalPos.stackEmpty() {
-					lastTerminalSymbol = stackSymbol.data[stackTerminalPos.data[stackTerminalPos.Top-1]]
+			//check if the first or the second symbol are terminal(at least one should be)
+			if stackSymbol.Top > 1 {
+				lastTerminalSymbol = stackSymbol.data[stackSymbol.Top-1]
+				if !isTerminal((lastTerminalSymbol)) {
+					lastTerminalSymbol = stackSymbol.data[stackSymbol.Top-2]
+				}
+				precedence = getPrecedence(lastTerminalSymbol, symbolID)
+			} else if stackSymbol.Top == 1 && isTerminal(stackSymbol.data[stackSymbol.Top-1]) {
+				lastTerminalSymbol = stackSymbol.data[stackSymbol.Top-1]
+				precedence = getPrecedence(lastTerminalSymbol, symbolID)
+			} else {
+				precedence = _YIELDS_PREC
+			}
+
+			if precedence == _YIELDS_PREC {
+				err = stackSymbol.push(symbolID)
+				err = stackYieldPPos.push(stackSymbol.Top - 1)
+			}
+			for precedence == _TAKES_PREC {
+				sPos, err = stackYieldPPos.pop()
+				if sPos == 0 || isTerminal(stackSymbol.data[sPos-1]) {
+					startRule = sPos
+				} else {
+					startRule = sPos - 1
+				}
+				lhs, pRule := findMatch(stackSymbol.data[startRule:stackSymbol.Top])
+				stackSymbol.Top = startRule
+				inputNumber = rule2InputNumber[int(pRule)]
+				if inputNumber == 2 {
+					y, err = dataMemory.pop()
+					x, err = dataMemory.pop()
+				}
+				hasOutput, output = parseExecutorNew(pRule, x, y)
+				if hasOutput {
+					err = dataMemory.push(output)
+				}
+				//err = parseExecutor(pRule, &dataMemory)
+				stackSymbol.push(lhs)
+				if stackSymbol.Top > 1 {
+					lastTerminalSymbol = stackSymbol.data[stackSymbol.Top-1]
+					if !isTerminal((lastTerminalSymbol)) {
+						lastTerminalSymbol = stackSymbol.data[stackSymbol.Top-2]
+					}
+					precedence = getPrecedence(lastTerminalSymbol, symbolID)
+				} else if stackSymbol.Top == 1 && isTerminal(stackSymbol.data[stackSymbol.Top-1]) {
+					lastTerminalSymbol = stackSymbol.data[stackSymbol.Top-1]
+					precedence = getPrecedence(lastTerminalSymbol, symbolID)
+				} else {
+					precedence = _YIELDS_PREC
+				}
+			}
+		}
+		if lexerReader.eof() {
+			for stackSymbol.Top > 1 {
+				sPos, err = stackYieldPPos.pop()
+				if sPos == 0 || isTerminal(stackSymbol.data[sPos-1]) {
+					startRule = sPos
+				} else {
+					startRule = sPos - 1
+				}
+				lhs, pRule := findMatch(stackSymbol.data[startRule:stackSymbol.Top])
+				stackSymbol.Top = startRule
+				inputNumber = rule2InputNumber[int(pRule)]
+				if inputNumber == 2 {
+					y, err = dataMemory.pop()
+					x, err = dataMemory.pop()
+				}
+				hasOutput, output = parseExecutorNew(pRule, x, y)
+				if hasOutput {
+					err = dataMemory.push(output)
+				}
+				//err = parseExecutor(pRule, &dataMemory)
+				stackSymbol.push(lhs)
+				if stackSymbol.Top > 1 {
+					lastTerminalSymbol = stackSymbol.data[stackSymbol.Top-1]
+					if !isTerminal((lastTerminalSymbol)) {
+						lastTerminalSymbol = stackSymbol.data[stackSymbol.Top-2]
+					}
+					precedence = getPrecedence(lastTerminalSymbol, symbolID)
+				} else if stackSymbol.Top == 1 && isTerminal(stackSymbol.data[stackSymbol.Top-1]) {
+					lastTerminalSymbol = stackSymbol.data[stackSymbol.Top-1]
+					precedence = getPrecedence(lastTerminalSymbol, symbolID)
+				} else {
+					precedence = _YIELDS_PREC
+				}
+			}
+		}
+
+	}
+
+	/*
+		if controlState == _LEX_CORRECT {
+			if isTerminal(symbolID) && (stackSymbol.Top>1 || isTerminal(stackSymbol.data[stackSymbol.Top -1] ) {
+				lastTerminalSymbol=stackSymbol.data[stackSymbol.Top-1]
+				if !isTerminal(lastTerminalSymbol){
+					lastTerminalSymbol=stackSymbol.data[stackSymbol.Top-2]
+				}
 					precedence = getPrecedence(lastTerminalSymbol, symbolID)
 					//curSymbol = Symbol{symbolId, precedence}
 
 					for precedence == _TAKES_PREC {
-						tPos, err = stackYieldPPos.pop()
-						sPos, err = stackTerminalPos.read(tPos)
+						sPos, err = stackYieldPPos.pop()
 						stackTerminalPos.Top = tPos
 
 						if sPos == 0 || isTerminal(stackSymbol.data[sPos-1]) {
@@ -74,9 +167,12 @@ func ParseStringNew(data []byte) (int64, error) {
 						//stackPrecedence.push(_NO_PREC)
 
 						//executefunction associated to candRule and push nonterminal
-						if !stackTerminalPos.stackEmpty() {
-							lastTerminalSymbol = stackSymbol.data[stackTerminalPos.data[stackTerminalPos.Top-1]]
-
+						if !(stackSymbol.Top == 0 || (stackSymbol.Top == 1 && !isTerminal(stackSymbol.data[stackSymbol.Top-1]))) {
+							if isTerminal(stackSymbol.data[stackSymbol.Top-1]) {
+								lastTerminalSymbol = stackSymbol.data[stackSymbol.Top-1]
+							} else {
+								lastTerminalSymbol = stackSymbol.data[stackSymbol.Top-2]
+							}
 							precedence = getPrecedence(lastTerminalSymbol, symbolID)
 						} else {
 							//just in case of sequential parsing or initial string, else NO_PREC
@@ -88,13 +184,12 @@ func ParseStringNew(data []byte) (int64, error) {
 					//err = stackPrecedence.push(precedence)
 					err = stackTerminalPos.push(stackSymbol.Top - 1)
 					if precedence == _YIELDS_PREC {
-						err = stackYieldPPos.push(stackTerminalPos.Top - 1)
+						err = stackYieldPPos.push(stackSymbol.Top - 1)
 					}
 				} else {
 					err = stackSymbol.push(symbolID)
 					//err = stackPrecedence.push(_YIELDS_PREC)
-					err = stackTerminalPos.push(stackSymbol.Top - 1)
-					err = stackYieldPPos.push(stackTerminalPos.Top - 1)
+					err = stackYieldPPos.push(stackSymbol.Top - 1)
 				}
 			} else {
 				err = stackSymbol.push(symbolID)
@@ -103,10 +198,8 @@ func ParseStringNew(data []byte) (int64, error) {
 		}
 		if lexerReader.eof() {
 			//just in case of sequential parsing or ending string
-			for !stackTerminalPos.stackEmpty() {
-				tPos, err = stackYieldPPos.pop()
-				sPos, err = stackTerminalPos.read(tPos)
-				stackTerminalPos.Top = tPos
+			for stackSymbol.Top > 1 {
+				sPos, err = stackYieldPPos.pop()
 
 				if sPos == 0 || isTerminal(stackSymbol.data[sPos-1]) {
 					startRule = sPos
@@ -130,7 +223,7 @@ func ParseStringNew(data []byte) (int64, error) {
 
 		}
 
-	}
+	}*/
 	res, err = dataMemory.pop()
 	return res, err
 }

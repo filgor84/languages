@@ -1,7 +1,9 @@
 package arithonline
 
 import (
+	"reflect"
 	"strconv"
+	"unsafe"
 )
 
 /*
@@ -64,4 +66,12 @@ func lexerExecutor(rule LexerRule, yydata yyData, stack *StackInt64) (int, uint1
 	}
 
 	return controlState, symbolID, err
+}
+
+func BytesToString(bytes []byte) string {
+	sliceHeader := (*reflect.SliceHeader)(unsafe.Pointer(&bytes))
+	return *(*string)(unsafe.Pointer(&reflect.StringHeader{
+		Data: sliceHeader.Data,
+		Len:  sliceHeader.Len,
+	}))
 }

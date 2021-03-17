@@ -18,12 +18,12 @@ func parserTestFile(b *testing.B, fileName string, exp_res int64) {
 		if err != nil {
 			b.Errorf("Error reading %s", fileName)
 		}
-		res, err = ParseStringNew(bytes)
+		res, err = ParseString(bytes)
 		if err != nil {
 			b.Errorf("Unexpected error: %v", err)
 		} else {
 			if res != exp_res {
-				b.Errorf("True res: %d\nExpected res: %d\n", exp_res, res)
+				b.Errorf("True res: %d\nObtained res: %d\n", exp_res, res)
 			}
 		}
 	}

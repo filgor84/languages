@@ -2,6 +2,7 @@ package arithonline
 
 import (
 	"fmt"
+	"io/ioutil"
 	"strings"
 	"testing"
 )
@@ -12,7 +13,7 @@ func yyLexOneToken(t *testing.T, data string) (string, error) {
 		[]byte(data),
 		0}
 	rule, yyData, err := lexerReader.yyLex()
-	res := fmt.Sprintf("Rule: %s, yytext: %s, Position: %d", rule.token, yyData.yytext, lexerReader.Pos)
+	res := fmt.Sprintf("Rule: %s, yytext: %s, Position: %d", dfaToString[rule.rule], yyData.yytext, lexerReader.Pos)
 	return res, err
 }
 
@@ -28,7 +29,7 @@ func yyLexWholeString(t *testing.T, data string) (string, error) {
 		if err != nil {
 			return strings.Join(res, "\n"), err
 		}
-		res = append(res, fmt.Sprintf("Rule: %s, yytext: %s", rule.token, yyData.yytext))
+		res = append(res, fmt.Sprintf("Rule: %s, yytext: %s", dfaToString[rule.rule], yyData.yytext))
 	}
 	return strings.Join(res, "\n"), nil
 }
@@ -90,6 +91,38 @@ Rule: NUMBER, yytext: 15`})
 		}
 	}
 
+}
+
+func lexerTestFile(b *testing.B, fileName string, exp_res int64) {
+	var res int64
+	for i := 0; i < b.N; i++ {
+		bytes, err := ioutil.ReadFile(fileName)
+		if err != nil {
+			b.Errorf("Error reading %s", fileName)
+		}
+		res, err = ParseStringNew(bytes)
+		if err != nil {
+			b.Errorf("Unexpected error: %v", err)
+		} else {
+			if res != exp_res {
+				b.Errorf("True res: %d\nExpected res: %d\n", exp_res, res)
+			}
+		}
+	}
+
+}
+
+func BenchmarkLexer10Mb(b *testing.B) {
+	data, err := ioutil.ReadFile("data/10MB.txt")
+	if err != nil {
+		b.Error("File not read correctly")
+	}
+	for i := 0; i < b.N; i++ {
+		l := LexerReader{dfaLanguage, data, 0}
+		for !l.eof() {
+			l.yyLex()
+		}
+	}
 }
 
 /*

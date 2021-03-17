@@ -6,8 +6,7 @@ import (
 
 //LexerRule represents the number and the
 type LexerRule struct {
-	rule  int
-	token string
+	rule int
 }
 
 type yyData struct {
@@ -68,8 +67,8 @@ func (l *LexerReader) yyLex() (LexerRule, yyData, error) {
 	if controlState == TOKEN_ERROR {
 		return LexerRule{}, yyData{}, errors.New("Error found during lexing")
 	}
-	rule := LexerRule{l.Automa.getRuleNumber(), l.Automa.getCurrentState().TokenString}
-	yydata := yyData{string(l.data[start:end]), start, end}
+	rule := LexerRule{l.Automa.getRuleNumber()}
+	yydata := yyData{BytesToString(l.data[start:end]), start, end}
 	l.Automa.CurState = 0
 	return rule, yydata, nil
 }

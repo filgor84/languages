@@ -1,19 +1,21 @@
 package arithperfect
 
-import "errors"
+import (
+	"errors"
+	"sync"
+)
 
-func papaString(data []byte) (int64, error) {
-	startLex := 0
-	endLex := 0
-	rule := 0
-	controlState := _LEX_ERROR
-	memoryStack := make([]int64, STACKSIZE)
-	var dmemTop int
-	symbolStack := make([]uint16, STACKSIZE)
-	var symTop int
-	yPrecStack := make([]int, STACKSIZE)
-	var yTop int
+func parseSequence(data []byte, stackData []int64, topData *int, stackSymbol *[]uint16, topSymbol *int, offset int, isStart bool, isEnd bool) error {
 	var err error
+	//***Variables for lexing part
+	var startLex int
+	var endLex int
+	var lexRule int
+	controlState := _LEX_ERROR
+	//***Variable for parsing part
+	stackYPos := make([]int, STACKSIZE) //Helper stack to keep in memory last terminal
+	//which yield precedenc
+	var topYPos int //Top of stackYPos
 	var symbol uint16
 	var lastTerminal uint16
 	var lastYieldPrecPos int
@@ -22,33 +24,37 @@ func papaString(data []byte) (int64, error) {
 	var parsingRule uint16
 	var precedence uint16
 	for startLex < len(data) {
-		endLex, rule, err = yyLex(&data, startLex)
+		endLex, lexRule, err = yyLex(&data, startLex)
 		if err != nil {
-			return -1, err
+			return err
 		}
-		controlState, symbol, err = lexerExecutor(rule, startLex, endLex, &data, &memoryStack, &dmemTop)
+		controlState, symbol, err = lexerExecutor(lexRule, startLex, endLex, &data, stackData, topData)
 		if err != nil {
-			return -1, err
+			return err
 		}
 		if controlState == _LEX_CORRECT {
 			//Find last terminal symbol on stack and calculate precedence
-			if symTop == 0 || (symTop == 1 && !isTerminal(symbolStack[0])) {
+			if *topSymbol == 0 || (*topSymbol == 1 && !isTerminal((*stackSymbol)[0])) {
 				//if there are no terminals assign by default _YIELDS_PREC(seq parsing only!)
-				precedence = _YIELDS_PREC
+				if isStart {
+					precedence = _YIELDS_PREC
+				} else {
+					precedence = _NO_PREC
+				}
 			} else {
 				//if there is a terminal (on the first two position, for sure) calculate precedence
-				lastTerminal = symbolStack[symTop-1]
+				lastTerminal = (*stackSymbol)[*topSymbol-1]
 				if !isTerminal(lastTerminal) {
-					lastTerminal = symbolStack[symTop-2]
+					lastTerminal = (*stackSymbol)[*topSymbol-2]
 				}
 				precedence = getPrecedence(lastTerminal, symbol)
 			}
 			for precedence == _TAKES_PREC {
 				//Pop position of first yield prec terminal
-				lastYieldPrecPos = yPrecStack[yTop-1]
-				yTop--
+				lastYieldPrecPos = stackYPos[topYPos-1]
+				topYPos--
 
-				if lastYieldPrecPos == 0 || isTerminal(symbolStack[lastYieldPrecPos-1]) {
+				if lastYieldPrecPos == 0 || isTerminal((*stackSymbol)[lastYieldPrecPos-1]) {
 					//if the last yield prec symbol is the first symbol on stack or the symbol before
 					//that is a terminal, then the rule will start from last yield prec symbol
 					ruleStart = lastYieldPrecPos
@@ -56,62 +62,69 @@ func papaString(data []byte) (int64, error) {
 				} else {
 					ruleStart = lastYieldPrecPos - 1
 				}
-				newNTSymbol, parsingRule = findMatch(symbolStack[ruleStart:symTop])
+				newNTSymbol, parsingRule = findMatch((*stackSymbol)[ruleStart:*topSymbol])
 				if newNTSymbol == _EMPTY {
-					return -1, errors.New("Unrecognized rule")
+					return errors.New("Unrecognized rule")
 				}
-				parserExecutor(parsingRule, &memoryStack, &dmemTop)
+				parserExecutor(parsingRule, stackData, topData)
 
-				symbolStack[ruleStart] = newNTSymbol
-				symTop = ruleStart + 1
+				(*stackSymbol)[ruleStart] = newNTSymbol
+				*topSymbol = ruleStart + 1
 
 				//Find last terminal symbol on stack and calculate precedence
-				if symTop == 1 && !isTerminal(symbolStack[0]) {
+				if *topSymbol == 1 && !isTerminal((*stackSymbol)[0]) {
 					//if there are no terminals assign by default _YIELDS_PREC(seq parsing only!)
 					precedence = _YIELDS_PREC
 				} else {
 					//if there is a terminal (on the first two position, for sure) calculate precedence
-					lastTerminal = symbolStack[symTop-1]
+					lastTerminal = (*stackSymbol)[*topSymbol-1]
 					if !isTerminal(lastTerminal) {
-						lastTerminal = symbolStack[symTop-2]
+						lastTerminal = (*stackSymbol)[*topSymbol-2]
 					}
 					precedence = getPrecedence(lastTerminal, symbol)
 				}
 
 			}
-			symbolStack[symTop] = symbol
+			(*stackSymbol)[*topSymbol] = symbol
 			if precedence == _YIELDS_PREC {
-				yPrecStack[yTop] = symTop
-				yTop++
+				stackYPos[topYPos] = *topSymbol
+				topYPos++
 			}
-			symTop++
+			*topSymbol++
 		}
 		startLex = endLex
 	}
-	for yTop > 0 {
-		lastYieldPrecPos = yPrecStack[yTop-1]
-		yTop--
+	if isEnd {
+		for topYPos > 0 {
+			lastYieldPrecPos = stackYPos[topYPos-1]
+			topYPos--
 
-		if lastYieldPrecPos == 0 || isTerminal(symbolStack[lastYieldPrecPos-1]) {
-			//if the last yield prec symbol is the first symbol on stack or the symbol before
-			//that is a terminal, then the rule will start from last yield prec symbol
-			ruleStart = lastYieldPrecPos
+			if lastYieldPrecPos == 0 || isTerminal((*stackSymbol)[lastYieldPrecPos-1]) {
+				//if the last yield prec symbol is the first symbol on stack or the symbol before
+				//that is a terminal, then the rule will start from last yield prec symbol
+				ruleStart = lastYieldPrecPos
 
-		} else {
-			ruleStart = lastYieldPrecPos - 1
+			} else {
+				ruleStart = lastYieldPrecPos - 1
+			}
+			newNTSymbol, parsingRule = findMatch((*stackSymbol)[ruleStart:*topSymbol])
+			if newNTSymbol == _EMPTY {
+				return errors.New("Unrecognized rule")
+			}
+			parserExecutor(parsingRule, stackData, topData)
+
+			(*stackSymbol)[ruleStart] = newNTSymbol
+			*topSymbol = ruleStart + 1
 		}
-		newNTSymbol, parsingRule = findMatch(symbolStack[ruleStart:symTop])
-		if newNTSymbol == _EMPTY {
-			return -1, errors.New("Unrecognized rule")
-		}
-		parserExecutor(parsingRule, &memoryStack, &dmemTop)
-
-		symbolStack[ruleStart] = newNTSymbol
-		symTop = ruleStart + 1
-
 	}
-	if dmemTop != 1 {
-		return -1, errors.New("More than one value on the stack")
-	}
-	return memoryStack[0], nil
+	/*
+		if *topData != 1 {
+			return errors.New("More than one value on the stack")
+		}*/
+	return nil
+}
+
+func parseSequenceSync(wg *sync.WaitGroup, data []byte, stackData *[]int64, topData *int, stackSymbol *[]uint16, topSymbol *int, offset int, isStart bool, isEnd bool) {
+	defer wg.Done()
+	parseSequence(data, stackData, topData, stackSymbol, topSymbol, offset, isStart, isEnd)
 }

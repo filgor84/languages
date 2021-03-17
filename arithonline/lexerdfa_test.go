@@ -7,9 +7,9 @@ import (
 func TestDfaFromFirstToThird(t *testing.T) {
 	dfa := newDfa([]lexerDfaState{
 
-		newDfaState([]int{1, -1, -1}, false, []int{0}, "a"),
-		newDfaState([]int{-1, 2, -1}, false, []int{0}, "b"),
-		newDfaState([]int{-1, -1, -1}, true, []int{0}, "C"),
+		newDfaState([]int{1, -1, -1}, false, []int{0}),
+		newDfaState([]int{-1, 2, -1}, false, []int{0}),
+		newDfaState([]int{-1, -1, -1}, true, []int{0}),
 	})
 	dfa.nextState(0)
 	dfa.nextState(1)
@@ -21,9 +21,9 @@ func TestDfaFromFirstToThird(t *testing.T) {
 func TestDfaWrongTransition(t *testing.T) {
 	dfa := newDfa([]lexerDfaState{
 
-		newDfaState([]int{1, -1, -1}, false, []int{0}, "a"),
-		newDfaState([]int{-1, 2, -1}, false, []int{0}, "b"),
-		newDfaState([]int{-1, -1, -1}, false, []int{0}, "c"),
+		newDfaState([]int{1, -1, -1}, false, []int{0}),
+		newDfaState([]int{-1, 2, -1}, false, []int{0}),
+		newDfaState([]int{-1, -1, -1}, false, []int{0}),
 	})
 	dfa.nextState(0)
 	if dfa.nextState(2) == true {
@@ -34,9 +34,9 @@ func TestDfaWrongTransition(t *testing.T) {
 func TestDfaWrongTransitionLastState(t *testing.T) {
 	dfa := newDfa([]lexerDfaState{
 
-		newDfaState([]int{1, -1, -1}, false, []int{0}, "a"),
-		newDfaState([]int{-1, 2, -1}, false, []int{0}, "b"),
-		newDfaState([]int{-1, -1, -1}, false, []int{0}, "c"),
+		newDfaState([]int{1, -1, -1}, false, []int{0}),
+		newDfaState([]int{-1, 2, -1}, false, []int{0}),
+		newDfaState([]int{-1, -1, -1}, false, []int{0}),
 	})
 	dfa.nextState(0)
 	dfa.nextState(2)
