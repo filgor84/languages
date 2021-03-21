@@ -16,7 +16,7 @@ func papaTestFile(fileName string, exp_res int64) error {
 	if err != nil {
 		return err
 	}
-	err = papaString(data, &stackData, &topData, &stackSymbol, &topSymbol, 0, true, true)
+	err = papaSequence(data, stackData, &topData, stackSymbol, &topSymbol, 0, true, true)
 	if err != nil {
 		return err
 	} else {
@@ -26,6 +26,33 @@ func papaTestFile(fileName string, exp_res int64) error {
 		}
 	}
 	return nil
+}
+
+func papaString(data []byte, isStart bool, isEnd bool) error {
+	stackSymbol := make([]uint16, STACKSIZE)
+	var topSymbol int
+	stackData := make([]int64, STACKSIZE)
+	var topData int
+	err := papaSequence(data, stackData, &topData, stackSymbol, &topSymbol, 0, isStart, isEnd)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+func TestStringStart(t *testing.T) {
+	data := []byte("4 * 5 + 3")
+	err := papaString(data, true, false)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestStringEnd(t *testing.T) {
+	data := []byte("+ 3 + 2 + 4 * 5")
+	err := papaString(data, false, true)
+	if err != nil {
+		t.Error(err)
+	}
 }
 
 func BenchmarkPapa1Mb(b *testing.B) {
