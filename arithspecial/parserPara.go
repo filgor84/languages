@@ -36,9 +36,9 @@ func parseWhole(data []byte, threads int) (int64, error) {
 
 	}
 	wg.Wait()
-	symbolsLeft := make([]uint16, 40*STACKSIZE)
-	stackDataFinal := make([]int64, 40*STACKSIZE)
-	dataLeft := make([]int64, 20*STACKSIZE)
+	symbolsLeft := make([]uint16, 100*STACKSIZE)
+	stackDataFinal := make([]int64, 100*STACKSIZE)
+	dataLeft := make([]int64, 100*STACKSIZE)
 	symbolNumber := 0
 	dataNumber := 0
 	for i := 0; i < len(stackDataTops); i++ {
