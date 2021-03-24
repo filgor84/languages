@@ -210,7 +210,18 @@ func BenchmarkParse20MB2048T(b *testing.B) {
 	numCPUs := runtime.NumCPU()
 	runtime.GOMAXPROCS(numCPUs)
 	for i := 0; i < b.N; i++ {
-		err := paraParseFile(1024, "data/20MB.txt", TWENTY_MB)
+		err := paraParseFile(2048, "data/20MB.txt", TWENTY_MB)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+func BenchmarkParse20MB4096T(b *testing.B) {
+	numCPUs := runtime.NumCPU()
+	runtime.GOMAXPROCS(numCPUs)
+	for i := 0; i < b.N; i++ {
+		err := paraParseFile(4096, "data/20MB.txt", TWENTY_MB)
 		if err != nil {
 			b.Error(err)
 		}
