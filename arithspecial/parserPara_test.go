@@ -13,10 +13,11 @@ const (
 	TEN_MB         = (1*2*3 + 11*222*3333*(1+2)) * 257473
 	TWENTY_MB      = 12573726911544
 	ONE_HUNDRED_MB = 12573726911544
+	DATA_DIR       = "/dev/shm/"
 )
 
 func paraParseFile(threads int, fileName string, exp_out int64) error {
-	data, err := ioutil.ReadFile(fileName)
+	data, err := ioutil.ReadFile(DATA_DIR + fileName)
 	if err != nil {
 		return err
 	}
