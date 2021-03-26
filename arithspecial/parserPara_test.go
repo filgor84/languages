@@ -415,3 +415,36 @@ func BenchmarkParse1GB128KT(b *testing.B) {
 		}
 	}
 }
+
+func BenchmarkParse10GB16KT(b *testing.B) {
+	numCPUs := runtime.NumCPU()
+	runtime.GOMAXPROCS(numCPUs)
+	for i := 0; i < b.N; i++ {
+		err := paraParseFile(16000, "data/10GB.txt", 1000*TEN_MB)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+func BenchmarkParse10GB32KT(b *testing.B) {
+	numCPUs := runtime.NumCPU()
+	runtime.GOMAXPROCS(numCPUs)
+	for i := 0; i < b.N; i++ {
+		err := paraParseFile(32000, "data/10GB.txt", 1000*TEN_MB)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+func BenchmarkParse10GB64KT(b *testing.B) {
+	numCPUs := runtime.NumCPU()
+	runtime.GOMAXPROCS(numCPUs)
+	for i := 0; i < b.N; i++ {
+		err := paraParseFile(64000, "data/10GB.txt", 1000*TEN_MB)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
