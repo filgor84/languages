@@ -12,7 +12,7 @@ func parseWhole(data []byte, threads int) (int64, error) {
 	stackOfStackData := make([]int64, threads*STACKSIZE)
 	stackDataTops := make([]int, threads)
 	splitPoint := make([]int, threads+1)
-	var startSplit int
+	startSplit := 0
 	var wg sync.WaitGroup
 	splitPoint[0] = 0
 	splitPoint[threads] = len(data)

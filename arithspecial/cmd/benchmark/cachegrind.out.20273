@@ -1,0 +1,9 @@
+desc: I1 cache:         32768 B, 64 B, 8-way associative
+desc: D1 cache:         32768 B, 64 B, 8-way associative
+desc: LL cache:         3145728 B, 64 B, 12-way associative
+cmd: benchmark
+events: Ir I1mr ILmr Dr D1mr DLmr Dw D1mw DLmw 
+fl=???
+fn=???
+0 6663278976 8659 4416 1485460423 333294 326996 770596072 16060 14149
+summary: 6663278976 8659 4416 1485460423 333294 326996 770596072 16060 14149
