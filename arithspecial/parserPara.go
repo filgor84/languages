@@ -36,9 +36,9 @@ func parseWhole(data []byte, threads int) (int64, error) {
 
 	}
 	wg.Wait()
-	symbolsLeft := make([]uint16, 100*STACKSIZE)
+	symbolsLeft := make([]uint16, 1000*STACKSIZE)
 	stackDataFinal := make([]int64, 100*STACKSIZE)
-	dataLeft := make([]int64, 100*STACKSIZE)
+	dataLeft := make([]int64, 1000*STACKSIZE)
 	symbolNumber := 0
 	dataNumber := 0
 	for i := 0; i < len(stackDataTops); i++ {
@@ -46,7 +46,7 @@ func parseWhole(data []byte, threads int) (int64, error) {
 	}
 	//fmt.Println("Symbols left to right")
 
-	var stackBase int
+	stackBase := 0
 	for i := 0; i < threads; i++ {
 		stackBase = i * STACKSIZE
 		curStackPos := 0
