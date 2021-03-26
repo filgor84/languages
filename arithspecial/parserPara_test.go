@@ -382,3 +382,14 @@ func BenchmarkParse1GB4096T(b *testing.B) {
 		}
 	}
 }
+
+func BenchmarkParse1GB32768T(b *testing.B) {
+	numCPUs := runtime.NumCPU()
+	runtime.GOMAXPROCS(numCPUs)
+	for i := 0; i < b.N; i++ {
+		err := paraParseFile(32768, "data/1GB.txt", 100*TEN_MB)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
