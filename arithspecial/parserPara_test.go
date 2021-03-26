@@ -11,8 +11,8 @@ const (
 	SMALL          = 1 + 2*3*(4+5)
 	ONE_MB         = (1*2*3 + 11*222*3333*(1+2)) * 25966
 	TEN_MB         = (1*2*3 + 11*222*3333*(1+2)) * 257473
-	TWENTY_MB      = 12573726911544
-	ONE_HUNDRED_MB = 62868634557720
+	TWENTY_MB      = 2 * TEN_MB
+	ONE_HUNDRED_MB = 10 * TEN_MB
 	DATA_DIR       = "/dev/shm/"
 )
 
@@ -344,6 +344,39 @@ func BenchmarkParse100MB16384T(b *testing.B) {
 	runtime.GOMAXPROCS(numCPUs)
 	for i := 0; i < b.N; i++ {
 		err := paraParseFile(16384, "data/100MB.txt", ONE_HUNDRED_MB)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+func BenchmarkParse1GB1T(b *testing.B) {
+	numCPUs := runtime.NumCPU()
+	runtime.GOMAXPROCS(numCPUs)
+	for i := 0; i < b.N; i++ {
+		err := paraParseFile(1, "data/1GB.txt", 100*TEN_MB)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+func BenchmarkParse1GB2048T(b *testing.B) {
+	numCPUs := runtime.NumCPU()
+	runtime.GOMAXPROCS(numCPUs)
+	for i := 0; i < b.N; i++ {
+		err := paraParseFile(2048, "data/1GB.txt", 100*TEN_MB)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+func BenchmarkParse1GB4096T(b *testing.B) {
+	numCPUs := runtime.NumCPU()
+	runtime.GOMAXPROCS(numCPUs)
+	for i := 0; i < b.N; i++ {
+		err := paraParseFile(4096, "data/1GB.txt", 100*TEN_MB)
 		if err != nil {
 			b.Error(err)
 		}
