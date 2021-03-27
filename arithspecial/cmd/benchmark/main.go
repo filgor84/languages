@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+
+	"github.com/filgor84/languages/arithspecial"
 )
 
 func main() {

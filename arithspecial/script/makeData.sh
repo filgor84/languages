@@ -19,3 +19,5 @@ do
 echo " + " >> "${DIR}1GB.txt"
 cat 10MB.txt >> "${DIR}1GB.txt"
 done
+#make 10GB
+cat 10MB.txt >"${DIR}10GB.txt"
