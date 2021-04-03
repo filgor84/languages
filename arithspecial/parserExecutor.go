@@ -25,70 +25,70 @@ func parseExecutorInput(ruleNum uint16) int {
 	return 0
 }
 
-func parserExecutor(ruleNum uint16, stack *[]int64, top *int) error {
+func parserExecutor(ruleNum uint16, stack []int64, top *int) error {
 	var input1 int64
 	var input2 int64
 	switch ruleNum {
 	case 0:
 	case 1:
-		input1 = (*stack)[(*top)-1]
+		input1 = stack[(*top)-1]
 		*top--
-		input2 = (*stack)[(*top)-1]
+		input2 = stack[(*top)-1]
 		*top--
-		(*stack)[*top] = input1 + input2
+		stack[*top] = input1 + input2
 		*top++
 	case 2:
-		input1 = (*stack)[(*top)-1]
+		input1 = stack[(*top)-1]
 		*top--
-		input2 = (*stack)[(*top)-1]
+		input2 = stack[(*top)-1]
 		*top--
-		(*stack)[*top] = input1 + input2
+		stack[*top] = input1 + input2
 		*top++
 	case 3:
-		input1 = (*stack)[(*top)-1]
+		input1 = stack[(*top)-1]
 		*top--
-		input2 = (*stack)[(*top)-1]
+		input2 = stack[(*top)-1]
 		*top--
-		(*stack)[*top] = input1 * input2
+		stack[*top] = input1 * input2
 		*top++
 	case 4:
 	case 5:
-		input1 = (*stack)[(*top)-1]
+		input1 = stack[(*top)-1]
 		*top--
-		input2 = (*stack)[(*top)-1]
+		input2 = stack[(*top)-1]
 		*top--
-		(*stack)[*top] = input1 + input2
+		stack[*top] = input1 + input2
 		*top++
 	case 6:
-		input1 = (*stack)[(*top)-1]
+		input1 = stack[(*top)-1]
 		*top--
-		input2 = (*stack)[(*top)-1]
+		input2 = stack[(*top)-1]
 		*top--
-		(*stack)[*top] = input1 + input2
+		stack[*top] = input1 + input2
 		*top++
 	case 7:
 	case 8:
 
-		input1 = (*stack)[(*top)-1]
+		input1 = stack[(*top)-1]
 		*top--
-		input2 = (*stack)[(*top)-1]
+		input2 = stack[(*top)-1]
 		*top--
-		(*stack)[*top] = input1 + input2
+		stack[*top] = input1 + input2
 		*top++
 	case 9:
 
-		input1 = (*stack)[(*top)-1]
+		input1 = stack[(*top)-1]
 		*top--
-		input2 = (*stack)[(*top)-1]
+		input2 = stack[(*top)-1]
 		*top--
-		(*stack)[*top] = input1 + input2
+		stack[*top] = input1 + input2
 		*top++
 	case 10:
-		input1 = (*stack)[(*top)-1]
+		input1 = stack[(*top)-1]
 		*top--
-		input2 = (*stack)[(*top)-1]
+		input2 = stack[(*top)-1]
 		*top--
-		(*stack)[*top] = input1 * input2
+		stack[*top] = input1 * input2
 		*top++
 	case 11:
 	case 12:

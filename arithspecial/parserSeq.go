@@ -25,11 +25,11 @@ func parseString(data []byte, memoryStack []int64, symbolStack []uint16, topMemo
 	var parsingRule uint16
 	var precedence uint16
 	for startLex < len(data) {
-		endLex, rule, err = yyLex(&data, startLex)
+		endLex, rule, err = yyLex(data, startLex)
 		if err != nil {
 			return err
 		}
-		controlState, symbol, err = lexerExecutor(rule, startLex, endLex, &data, &memoryStack, topMemory)
+		controlState, symbol, err = lexerExecutor(rule, startLex, endLex, data, memoryStack, topMemory)
 		if err != nil {
 			return err
 		}
@@ -64,7 +64,7 @@ func parseString(data []byte, memoryStack []int64, symbolStack []uint16, topMemo
 					newNTSymbol, parsingRule = findMatch(symbolStack[ruleStart:*topSymbol])
 					if newNTSymbol != _EMPTY {
 						//errors.New("Unrecognized rule")
-						parserExecutor(parsingRule, &memoryStack, topMemory)
+						parserExecutor(parsingRule, memoryStack, topMemory)
 						symbolStack[ruleStart] = newNTSymbol
 						*topSymbol = ruleStart + 1
 						continue
@@ -109,7 +109,7 @@ func parseString(data []byte, memoryStack []int64, symbolStack []uint16, topMemo
 		if newNTSymbol == _EMPTY {
 			break
 		}
-		parserExecutor(parsingRule, &memoryStack, topMemory)
+		parserExecutor(parsingRule, memoryStack, topMemory)
 		symbolStack[ruleStart] = newNTSymbol
 		*topSymbol = ruleStart + 1
 	}

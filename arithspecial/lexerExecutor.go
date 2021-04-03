@@ -16,11 +16,11 @@ const (
 /*
 lexerFunction is the semantic function of the lexer.
 */
-func lexerExecutor(rule int, start int, end int, data *[]byte, stack *[]int64, top *int) (int, uint16, error) {
+func lexerExecutor(rule int, start int, end int, data []byte, stack []int64, top *int) (int, uint16, error) {
 	var symbolID uint16
 	var err error
 	controlState := _LEX_ERROR
-	yytext := BytesToString((*data)[start:end])
+	yytext := BytesToString((data)[start:end])
 	//yytext := string((*data)[start:end])
 
 	switch rule {
@@ -50,7 +50,7 @@ func lexerExecutor(rule int, start int, end int, data *[]byte, stack *[]int64, t
 			symbolID = NUMBER
 			yyValue, err = strconv.ParseInt(yytext, 10, 64)
 			if err == nil {
-				(*stack)[*top] = yyValue
+				stack[*top] = yyValue
 				*top++
 			}
 			controlState = _LEX_CORRECT

@@ -51,7 +51,7 @@ func parseFinal(symbolsLeft []uint16, symNumber int, dataLeft []int64, dataNumbe
 				newNTSymbol, parsingRule = findMatch(symbolStack[ruleStart:topSymbol])
 				if newNTSymbol != _EMPTY {
 					//errors.New("Unrecognized rule")
-					parserExecutor(parsingRule, &memoryStack, &topMemory)
+					parserExecutor(parsingRule, memoryStack, &topMemory)
 					symbolStack[ruleStart] = newNTSymbol
 					topSymbol = ruleStart + 1
 					continue
@@ -86,7 +86,7 @@ func parseFinal(symbolsLeft []uint16, symNumber int, dataLeft []int64, dataNumbe
 		if newNTSymbol == _EMPTY {
 			break
 		}
-		parserExecutor(parsingRule, &memoryStack, &topMemory)
+		parserExecutor(parsingRule, memoryStack, &topMemory)
 		symbolStack[ruleStart] = newNTSymbol
 		topSymbol = ruleStart + 1
 	}
