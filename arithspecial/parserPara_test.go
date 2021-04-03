@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"runtime"
-	"runtime/debug"
 	"testing"
 )
 
@@ -18,7 +17,6 @@ const (
 )
 
 func paraParseFile(threads int, fileName string, exp_out int64) error {
-	debug.SetGCPercent(-1)
 	data, err := ioutil.ReadFile(DATA_DIR + fileName)
 	if err != nil {
 		return err
@@ -388,7 +386,6 @@ func BenchmarkParse1GB4096T(b *testing.B) {
 func BenchmarkParse1GB32768T(b *testing.B) {
 	numCPUs := runtime.NumCPU()
 	runtime.GOMAXPROCS(numCPUs)
-	debug.SetGCPercent(-1)
 	for i := 0; i < b.N; i++ {
 		err := paraParseFile(32768, "data/1GB.txt", 100*TEN_MB)
 		if err != nil {
