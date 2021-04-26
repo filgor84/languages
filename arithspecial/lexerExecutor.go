@@ -19,7 +19,7 @@ func lexerExecutor(rule int, start int, end int, data []byte, stack []int64, top
 	var symbolID uint16
 	var err error
 	controlState := _LEX_ERROR
-	yytext := BytesToString(data[start:end])
+	yytext := BytesToString(data)
 	//yytext := string((*data)[start:end])
 
 	switch rule {
@@ -77,14 +77,6 @@ func lexerExecutor(rule int, start int, end int, data []byte, stack []int64, top
 	return controlState, symbolID, err
 }
 
-/*
-func BytesToString(bytes []byte) string {
-	sliceHeader := (*reflect.SliceHeader)(unsafe.Pointer(&bytes))
-	return *(*string)(unsafe.Pointer(&reflect.StringHeader{
-		Data: sliceHeader.Data,
-		Len:  sliceHeader.Len,
-	}))
-}*/
 func BytesToString(bs []byte) string {
 	return *(*string)(unsafe.Pointer(&bs))
 }

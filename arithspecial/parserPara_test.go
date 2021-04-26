@@ -251,6 +251,17 @@ func BenchmarkParse100MB1T(b *testing.B) {
 	}
 }
 
+func BenchmarkParse100MB4T(b *testing.B) {
+	numCPUs := runtime.NumCPU()
+	runtime.GOMAXPROCS(numCPUs)
+	for i := 0; i < b.N; i++ {
+		err := paraParseFile(4, "data/100MB.txt", ONE_HUNDRED_MB)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
 func BenchmarkParse100MB8T(b *testing.B) {
 	numCPUs := runtime.NumCPU()
 	runtime.GOMAXPROCS(numCPUs)
@@ -262,6 +273,38 @@ func BenchmarkParse100MB8T(b *testing.B) {
 	}
 }
 
+func BenchmarkParse100MB16T(b *testing.B) {
+	numCPUs := runtime.NumCPU()
+	runtime.GOMAXPROCS(numCPUs)
+	for i := 0; i < b.N; i++ {
+		err := paraParseFile(16, "data/100MB.txt", ONE_HUNDRED_MB)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+func BenchmarkParse100MB32T(b *testing.B) {
+	numCPUs := runtime.NumCPU()
+	runtime.GOMAXPROCS(numCPUs)
+	for i := 0; i < b.N; i++ {
+		err := paraParseFile(32, "data/100MB.txt", ONE_HUNDRED_MB)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+func BenchmarkParse100MB64T(b *testing.B) {
+	numCPUs := runtime.NumCPU()
+	runtime.GOMAXPROCS(numCPUs)
+	for i := 0; i < b.N; i++ {
+		err := paraParseFile(64, "data/100MB.txt", ONE_HUNDRED_MB)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
 func BenchmarkParse100MB128T(b *testing.B) {
 	numCPUs := runtime.NumCPU()
 	runtime.GOMAXPROCS(numCPUs)
@@ -284,72 +327,6 @@ func BenchmarkParse100MB256T(b *testing.B) {
 	}
 }
 
-func BenchmarkParse100MB512T(b *testing.B) {
-	numCPUs := runtime.NumCPU()
-	runtime.GOMAXPROCS(numCPUs)
-	for i := 0; i < b.N; i++ {
-		err := paraParseFile(512, "data/100MB.txt", ONE_HUNDRED_MB)
-		if err != nil {
-			b.Error(err)
-		}
-	}
-}
-
-func BenchmarkParse100MB1024T(b *testing.B) {
-	numCPUs := runtime.NumCPU()
-	runtime.GOMAXPROCS(numCPUs)
-	for i := 0; i < b.N; i++ {
-		err := paraParseFile(1024, "data/100MB.txt", ONE_HUNDRED_MB)
-		if err != nil {
-			b.Error(err)
-		}
-	}
-}
-
-func BenchmarkParse100MB2048T(b *testing.B) {
-	numCPUs := runtime.NumCPU()
-	runtime.GOMAXPROCS(numCPUs)
-	for i := 0; i < b.N; i++ {
-		err := paraParseFile(2048, "data/100MB.txt", ONE_HUNDRED_MB)
-		if err != nil {
-			b.Error(err)
-		}
-	}
-}
-
-func BenchmarkParse100MB4096T(b *testing.B) {
-	numCPUs := runtime.NumCPU()
-	runtime.GOMAXPROCS(numCPUs)
-	for i := 0; i < b.N; i++ {
-		err := paraParseFile(4096, "data/100MB.txt", ONE_HUNDRED_MB)
-		if err != nil {
-			b.Error(err)
-		}
-	}
-}
-
-func BenchmarkParse100MB8192T(b *testing.B) {
-	numCPUs := runtime.NumCPU()
-	runtime.GOMAXPROCS(numCPUs)
-	for i := 0; i < b.N; i++ {
-		err := paraParseFile(8192, "data/100MB.txt", ONE_HUNDRED_MB)
-		if err != nil {
-			b.Error(err)
-		}
-	}
-}
-
-func BenchmarkParse100MB16384T(b *testing.B) {
-	numCPUs := runtime.NumCPU()
-	runtime.GOMAXPROCS(numCPUs)
-	for i := 0; i < b.N; i++ {
-		err := paraParseFile(16384, "data/100MB.txt", ONE_HUNDRED_MB)
-		if err != nil {
-			b.Error(err)
-		}
-	}
-}
-
 func BenchmarkParse1GB1T(b *testing.B) {
 	numCPUs := runtime.NumCPU()
 	runtime.GOMAXPROCS(numCPUs)
@@ -361,6 +338,38 @@ func BenchmarkParse1GB1T(b *testing.B) {
 	}
 }
 
+func BenchmarkParse1GB2T(b *testing.B) {
+	numCPUs := runtime.NumCPU()
+	runtime.GOMAXPROCS(numCPUs)
+	for i := 0; i < b.N; i++ {
+		err := paraParseFile(2, "data/1GB.txt", 100*TEN_MB)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+func BenchmarkParse1GB4T(b *testing.B) {
+	numCPUs := runtime.NumCPU()
+	runtime.GOMAXPROCS(numCPUs)
+	for i := 0; i < b.N; i++ {
+		err := paraParseFile(4, "data/1GB.txt", 100*TEN_MB)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+func BenchmarkParse1GB8T(b *testing.B) {
+	numCPUs := runtime.NumCPU()
+	runtime.GOMAXPROCS(numCPUs)
+	for i := 0; i < b.N; i++ {
+		err := paraParseFile(8, "data/1GB.txt", 100*TEN_MB)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
 func BenchmarkParse1GB2048T(b *testing.B) {
 	numCPUs := runtime.NumCPU()
 	runtime.GOMAXPROCS(numCPUs)

@@ -37,3 +37,7 @@ func getPrecedence(token1 uint16, token2 uint16) uint16 {
 
 	return uint16((elem >> pos) & 0x3)
 }
+
+func getPrecedenceEasy(token1 uint16, token2 uint16) uint16 {
+	return _PREC_MATRIX[tokenValue(token1)][tokenValue(token2)]
+}

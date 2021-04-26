@@ -33,7 +33,7 @@ func parseFinal(symbolsLeft []uint16, symNumber int, dataLeft []int64, dataNumbe
 				if !isTerminal(lastTerminal) {
 					lastTerminal = symbolStack[topSymbol-2]
 				}
-				precedence = getPrecedence(lastTerminal, symbol)
+				precedence = getPrecedenceEasy(lastTerminal, symbol)
 			}
 			//Pop position of first yield prec terminal
 			if precedence == _TAKES_PREC && yTop > 0 {

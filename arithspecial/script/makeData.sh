@@ -1,6 +1,7 @@
 #!/bin/bash
 cd ~/go/src/github.com/filgor84/languages/arithspecial/data
-DIR="/dev/shm/"
+DIR="/dev/shm/data/"
+mkdir $DIR
 ### make 20 MB file
 cat 10MB.txt > "${DIR}20MB.txt"
 echo " + " >> "${DIR}20MB.txt"

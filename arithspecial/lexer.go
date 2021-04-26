@@ -1,6 +1,8 @@
 package arithspecial
 
-import "errors"
+import (
+	"errors"
+)
 
 func yyLex(data []byte, start int) (int, int, error) {
 	state := 0

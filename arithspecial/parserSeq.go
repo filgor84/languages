@@ -25,11 +25,13 @@ func parseString(data []byte, memoryStack []int64, symbolStack []uint16, topMemo
 	var parsingRule uint16
 	var precedence uint16
 	for startLex < len(data) {
+		//endLex, rule = matchArith(data[startLex:])
+		//endLex = endLex + startLex
 		endLex, rule, err = yyLex(data, startLex)
 		if err != nil {
 			return err
 		}
-		controlState, symbol, err = lexerExecutor(rule, startLex, endLex, data, memoryStack, topMemory)
+		controlState, symbol, err = lexerExecutor(rule, startLex, endLex, data[startLex:endLex], memoryStack, topMemory)
 		if err != nil {
 			return err
 		}
@@ -46,7 +48,8 @@ func parseString(data []byte, memoryStack []int64, symbolStack []uint16, topMemo
 					if !isTerminal(lastTerminal) {
 						lastTerminal = symbolStack[*topSymbol-2]
 					}
-					precedence = getPrecedence(lastTerminal, symbol)
+					//precedence = getPrecedence(lastTerminal, symbol)
+					precedence = getPrecedenceEasy(lastTerminal, symbol)
 				}
 				//Pop position of first yield prec terminal
 				if precedence == _TAKES_PREC && yTop > 0 {
